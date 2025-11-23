@@ -11,22 +11,31 @@ npm install
 
 ### 2. Configure Environment Variables
 
-Copy `.env.example` to `.env`:
-```bash
-cp .env.example .env
+**🚀 QUICK SETUP (Windows):**
+
+Double-click `create-env.bat` or run in PowerShell:
+```powershell
+.\create-env.ps1
 ```
 
-Then edit `.env` and fill in:
+This creates a `.env` file with **SendGrid** pre-configured!
+
+**📝 Manual Setup:**
+
+Copy `.env.example` to `.env` or see `CREATE_ENV.md` for step-by-step instructions.
+
+**⚠️ IMPORTANT:** Open `.env` and update `SMTP_FROM` with your verified SendGrid email!
 
 **SMTP Configuration (for email notifications):**
-- `SMTP_HOST` - Your email provider's SMTP server (e.g., smtp.gmail.com)
-- `SMTP_PORT` - Usually 587 for TLS
-- `SMTP_USER` - Your email address
-- `SMTP_PASSWORD` - Your email password or app-specific password
+- `SMTP_HOST=smtp.sendgrid.net` ✅ Already set
+- `SMTP_PORT=587` ✅ Already set
+- `SMTP_USER=apikey` ✅ Already set
+- `SMTP_PASS=<your-sendgrid-api-key>` ✅ Already set
+- `SMTP_FROM=<your-verified-email>` ⚠️ **YOU MUST UPDATE THIS!**
 
 **Firebase Configuration:**
-- All `FIREBASE_*` variables are already filled in `.env.example` with your project credentials
-- Just copy them to your `.env` file (already done if you copied .env.example)
+- Uses `serviceAccountKey.json` for local development (already in folder)
+- For production, set `FIREBASE_*` environment variables (see `ENV_SETUP.md`)
 
 ### 3. Run the Server
 

@@ -1,34 +1,30 @@
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const sendEmail = async (to, subject, html) => {
-    // Create transporter fresh each time to avoid connection issues
-    const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT), // CRITICAL: Must be a number, not string!
-        secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
-        },
-        connectionTimeout: 10000, // 10 seconds timeout
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
-    });
+// Configure SendGrid with API key
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+export const sendEmail = async (to, subject, html) => {
     try {
-        const info = await transporter.sendMail({
-            from: process.env.SMTP_FROM || process.env.SMTP_USER,
+        console.log('📧 Sending email via SendGrid HTTP API to:', to);
+        
+        const msg = {
             to,
+            from: process.env.SENDGRID_FROM_EMAIL,
             subject,
             html,
-        });
-        console.log('Message sent: %s', info.messageId);
-        return info;
+        };
+
+        const response = await sgMail.send(msg);
+        console.log('✅ Email sent successfully via SendGrid!');
+        return response;
     } catch (error) {
-        console.error('Error sending email:', error);
+        console.error('❌ Error sending email via SendGrid:', error);
+        if (error.response) {
+            console.error('SendGrid API Error:', error.response.body);
+        }
         throw error;
     }
 };
