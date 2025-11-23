@@ -206,7 +206,7 @@ app.post('/api/reservations', async (req, res) => {
             console.log('✅ User email sent');
 
             console.log('📧 Sending notification email to admin...');
-            await sendAdminNotificationEmail(process.env.SMTP_USER, {
+            await sendAdminNotificationEmail(process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL, {
                 nom, etablissement, telephone, email, date, startHour, endHour, spaces, note
             });
             console.log('✅ Admin email sent');
