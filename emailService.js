@@ -3,20 +3,24 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    },
-});
-
 export const sendEmail = async (to, subject, html) => {
+    // Create transporter fresh each time to avoid connection issues
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT), // CRITICAL: Must be a number, not string!
+        secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        },
+        connectionTimeout: 10000, // 10 seconds timeout
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
+    });
+
     try {
         const info = await transporter.sendMail({
-            from: `FabLab Reservations <${process.env.SMTP_FROM}>`,
+            from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to,
             subject,
             html,
