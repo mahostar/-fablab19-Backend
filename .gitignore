@@ -1,0 +1,17 @@
+node_modules
+
+# Environment variables (Contains ALL sensitive data including Firebase credentials)
+.env
+.env.*
+!.env.example
+
+# Legacy Firebase JSON file (if it exists, don't commit it)
+serviceAccountKey.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
