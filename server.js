@@ -154,7 +154,13 @@ app.get('/api/reservations', async (req, res) => {
 // Create a new reservation
 app.post('/api/reservations', async (req, res) => {
     try {
-        const { nom, etablissement, telephone, email, spaces, date, startHour, endHour, note, turnstileToken } = req.body;
+        let { nom, etablissement, telephone, email, spaces, date, startHour, endHour, note, turnstileToken } = req.body;
+
+        // Normalize date: If it comes as a full ISO string (e.g. from Date object), extract YYYY-MM-DD
+        if (date && date.includes('T')) {
+            date = date.split('T')[0];
+            console.log(`📅 Normalized date to: ${date}`);
+        }
 
         // Verify Turnstile token if provided
         // NOTE: Turnstile validation is currently lenient to allow deployment domain issues
