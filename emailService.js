@@ -1,13 +1,34 @@
-to,
-    subject,
-    html,
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: 465, // Use port 465 for SSL
+    secure: true, // Use SSL
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+    },
+    // Force IPv4 to avoid Gmail IPv6 issues on some hosting platforms
+    family: 4
+});
+
+export const sendEmail = async (to, subject, html) => {
+    try {
+        const info = await transporter.sendMail({
+            from: `FabLab Reservations <${process.env.SMTP_FROM}>`,
+            to,
+            subject,
+            html,
         });
-console.log('Message sent: %s', info.messageId);
-return info;
+        console.log('Message sent: %s', info.messageId);
+        return info;
     } catch (error) {
-    console.error('Error sending email:', error);
-    throw error;
-}
+        console.error('Error sending email:', error);
+        throw error;
+    }
 };
 
 const formatTime = (hour) => {
