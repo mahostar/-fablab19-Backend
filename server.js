@@ -195,18 +195,30 @@ app.post('/api/reservations', async (req, res) => {
             createdAt: admin.firestore.FieldValue.serverTimestamp()
         };
 
+        console.log('💾 Saving reservation to Firestore...');
         const docRef = await db.collection(RESERVATIONS_COLLECTION).add(newReservation);
+        console.log(`✅ Reservation saved with ID: ${docRef.id}`);
 
         // Send Emails
-        await sendReservationPendingEmail(email, { nom, date, startHour, endHour, spaces });
-        await sendAdminNotificationEmail(process.env.SMTP_USER, {
-            nom, etablissement, telephone, email, date, startHour, endHour, spaces, note
-        });
+        try {
+            console.log('📧 Sending confirmation email to user...');
+            await sendReservationPendingEmail(email, { nom, date, startHour, endHour, spaces });
+            console.log('✅ User email sent');
+
+            console.log('📧 Sending notification email to admin...');
+            await sendAdminNotificationEmail(process.env.SMTP_USER, {
+                nom, etablissement, telephone, email, date, startHour, endHour, spaces, note
+            });
+            console.log('✅ Admin email sent');
+        } catch (emailError) {
+            console.error('⚠️ Email sending failed (non-fatal):', emailError);
+            // Don't fail the request if email fails
+        }
 
         res.status(201).json({ id: docRef.id, message: 'Reservation created successfully' });
     } catch (error) {
-        console.error('Error creating reservation:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error('❌ Error creating reservation:', error);
+        res.status(500).json({ error: 'Internal Server Error: ' + error.message });
     }
 });
 
